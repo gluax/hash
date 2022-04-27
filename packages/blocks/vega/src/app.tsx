@@ -1,17 +1,29 @@
 import * as React from "react";
 
 import { BlockComponent } from "blockprotocol/react";
+import { Vega, VegaLite } from "react-vega";
 
 type AppProps = {
-  name: string;
+  language: string;
+  content: string;
 };
 
-export const App: BlockComponent<AppProps> = ({ entityId, name }) => (
-  <>
-    <h1>Hello, {name}!</h1>
-    <p>
-      The entityId of this block is {entityId}. Use it to update its data when
-      calling updateEntities.
-    </p>
-  </>
-);
+export const App: BlockComponent<AppProps> = ({ content }) => {
+  const spec = React.useMemo(() => {
+    try {
+      return JSON.parse(content);
+    } catch {
+      return undefined;
+    }
+  }, [content]);
+
+  if (!spec) {
+    return <>Error parsing vega spec {content}</>;
+  }
+
+  return spec.$schema?.includes("-lite") ? (
+    <VegaLite spec={spec} />
+  ) : (
+    <Vega spec={spec} />
+  );
+};

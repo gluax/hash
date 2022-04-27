@@ -18,7 +18,10 @@
     "serve": "block-scripts serve"
   },
   "dependencies": {
-    "blockprotocol": "0.0.7"
+    "blockprotocol": "0.0.7",
+    "react-vega": "7.5.0",
+    "vega": "5.22.1",
+    "vega-lite": "5.2.0"
   },
   "devDependencies": {
     "block-scripts": "0.0.5",
