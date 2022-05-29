@@ -33,6 +33,7 @@ type AppProps = {
   Component: NextPageWithLayout;
 } & NextAppProps;
 
+
 const App: React.VoidFunctionComponent<AppProps> = ({
   Component,
   pageProps,
