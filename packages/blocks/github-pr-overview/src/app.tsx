@@ -21,6 +21,7 @@ import {
   getPrs,
 } from "./entity-aggregations";
 import { PullRequestSelector } from "./pull-request-selector";
+import { PullRequestSelector as PullRequestSelector1 } from "./pull-request-selector-1";
 
 export enum BlockState {
   Loading,
@@ -220,10 +221,16 @@ export const App: BlockComponent<BlockEntityProperties> = ({
         {blockState === BlockState.Loading ? (
           <CircularProgress />
         ) : blockState === BlockState.Selector ? (
-          <PullRequestSelector
-            setSelectedPullRequestId={setSelectedPullRequestIdAndPersist}
-            allPrs={allPrs!}
-          />
+          <>
+            <PullRequestSelector
+              setSelectedPullRequestId={setSelectedPullRequestIdAndPersist}
+              allPrs={allPrs!}
+            />
+            <PullRequestSelector1
+              setSelectedPullRequestId={setSelectedPullRequestIdAndPersist}
+              allPrs={allPrs!}
+            />
+          </>
         ) : blockState === BlockState.Overview ? (
           <GithubPrOverview
             pullRequest={pullRequest!}
