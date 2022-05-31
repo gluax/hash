@@ -96,7 +96,6 @@
   font-display: swap;
   src: url("./fonts/OpenSauceTwo-BoldItalic.ttf") format("truetype");
 } */
-
 .prOverviewContainer > div {
   display: flex;
   flex-direction: column;
