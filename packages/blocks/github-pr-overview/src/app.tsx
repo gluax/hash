@@ -1,7 +1,6 @@
 import * as React from "react";
 
 import { BlockComponent } from "blockprotocol/react";
-import CircularProgress from "@mui/material/CircularProgress";
 import { theme } from "@hashintel/hash-design-system";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import {
@@ -21,7 +20,7 @@ import {
   getPrs,
 } from "./entity-aggregations";
 import { PullRequestSelector } from "./pull-request-selector";
-import { PullRequestSelector as PullRequestSelector1 } from "./pull-request-selector-1";
+import { LoadingUI } from "./loading-ui";
 
 export enum BlockState {
   Loading,
@@ -219,18 +218,12 @@ export const App: BlockComponent<AppProps> = ({
       <CssBaseline />
       <div>
         {blockState === BlockState.Loading ? (
-          <CircularProgress />
+          <LoadingUI title="Setting up Block" />
         ) : blockState === BlockState.Selector ? (
-          <>
-            <PullRequestSelector
-              setSelectedPullRequestId={setSelectedPullRequestIdAndPersist}
-              allPrs={allPrs!}
-            />
-            <PullRequestSelector1
-              setSelectedPullRequestId={setSelectedPullRequestIdAndPersist}
-              allPrs={allPrs!}
-            />
-          </>
+          <PullRequestSelector
+            setSelectedPullRequestId={setSelectedPullRequestIdAndPersist}
+            allPrs={allPrs!}
+          />
         ) : blockState === BlockState.Overview ? (
           <GithubPrOverview
             pullRequest={pullRequest!}
