@@ -4,7 +4,7 @@ import {
   ButtonProps as MuiButtonProps,
   useTheme,
 } from "@mui/material";
-import { VFC, forwardRef, useMemo, ReactNode } from "react";
+import React, { VFC, forwardRef, useMemo, ReactNode } from "react";
 import { LoadingSpinner } from "./loading-spinner";
 
 export type ButtonProps = {

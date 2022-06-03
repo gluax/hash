@@ -3,6 +3,7 @@ import * as React from "react";
 import { Box, Typography, Autocomplete, TextField } from "@mui/material";
 import { GithubPullRequest } from "./types";
 import { LoadingUI } from "./loading-ui";
+import { GithubIcon } from "./icons";
 
 export type PullRequestSelectorProps = {
   allPrs: Map<string, GithubPullRequest>;
@@ -83,9 +84,14 @@ export const PullRequestSelector: React.FunctionComponent<
           alignItems: "center",
         }}
       >
-        <Box sx={{ height: 56, width: 56, border: "1px solid red", mb: 2 }}>
-          {/* icon here */}
-        </Box>
+        <GithubIcon
+          sx={({ palette }) => ({
+            height: 56,
+            width: 56,
+            mb: 2,
+            color: palette.gray[80],
+          })}
+        />
         <Typography variant="h2" sx={{ textAlign: "center", mb: 3 }}>
           Select a Github pull request to create a timeline
         </Typography>
