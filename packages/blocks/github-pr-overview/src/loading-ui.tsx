@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
-import { LoadingSpinner } from "@hashintel/hash-design-system";
+// import { LoadingSpinner } from "@hashintel/hash-design-system";
 
 export type PullRequestSelectorProps = {
   title?: string;
@@ -40,7 +40,7 @@ export const LoadingUI: React.FunctionComponent<PullRequestSelectorProps> = ({
         </Typography>
 
         <Box display="flex" justifyContent="center">
-          <LoadingSpinner size={50} thickness={8} />
+          {/* <LoadingSpinner size={50} thickness={8} /> */}
         </Box>
       </Box>
     </Box>
