@@ -10,20 +10,19 @@ import {
   TimelineSeparator,
 } from "@mui/lab";
 import {
-  Tooltip,
-  Button,
   Popover,
   Typography,
   Stack,
   Avatar,
   IconButton,
   Box,
+  Tooltip,
 } from "@mui/material";
 import { format } from "date-fns";
 import { startCase } from "lodash";
 import * as React from "react";
-import { LinkIcon, PullRequestIcon } from "./icons";
-import { GithubPullRequest, GithubReview } from "./types";
+import { LinkIcon, PullRequestIcon } from "../icons";
+import { GithubPullRequest, GithubReview } from "../types";
 
 const NODE_COLORS = {
   opened: theme.palette.gray[40],
@@ -50,31 +49,26 @@ type Event = {
 };
 
 export type TimelineItemProps = {
-  color:
-    | "inherit"
-    | "grey"
-    | "primary"
-    | "secondary"
-    | "error"
-    | "info"
-    | "success"
-    | "warning";
   event: Event;
   hideConnector?: boolean;
   setTimelineOpacity: (val: boolean) => void;
-  showPopover: boolean;
 } & BaseTimelineItemProps;
 
 // @todo make popover come on hover instead of onClick
 export const TimelineItem: React.FC<TimelineItemProps> = ({
   event,
-  color,
   hideConnector,
   setTimelineOpacity,
 }) => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
 
   //   const color = React.useMemo(() => {}, [[event]]);
+
+  const copyToClipboard = (link: string | null) => {
+    if (link) {
+      void navigator.clipboard.writeText(link);
+    }
+  };
 
   return (
     <BaseTimelineItem className="timelineItem">
@@ -89,7 +83,6 @@ export const TimelineItem: React.FC<TimelineItemProps> = ({
           color: palette.gray[80],
           alignSelf: "flex-start",
         })}
-        color="text.secondary"
       >
         {event.created_at && format(new Date(event.created_at), "do MMM")}
       </TimelineOppositeContent>
@@ -122,12 +115,13 @@ export const TimelineItem: React.FC<TimelineItemProps> = ({
           <TimelineDot
             sx={{
               alignSelf: "center",
+              backgroundColor:
+                NODE_COLORS[event.event] ?? theme.palette.gray[40],
             }}
             onMouseEnter={(evt) => {
               setAnchorEl(evt.currentTarget);
               setTimelineOpacity(true);
             }}
-            color={color}
           />
         )}
 
@@ -143,38 +137,10 @@ export const TimelineItem: React.FC<TimelineItemProps> = ({
         )}
       </TimelineSeparator>
       <TimelineContent>
-        <Tooltip
-          title={
-            <>
-              {event.actor?.login != null ? (
-                <span>Actor: {event.actor.login}</span>
-              ) : null}
-              {event.html_url != null && typeof event.html_url === "string" ? (
-                <>
-                  <br />
-                  <Button
-                    startIcon={<Link />}
-                    href={event.html_url}
-                    variant="primary"
-                    size="small"
-                  >
-                    Link
-                  </Button>
-                </>
-              ) : null}
-            </>
-          }
-        >
-          {/* Even though this span isn't in a list, React complains about list elements needing unique keys unless 
-                    we add a key here. Assuming it's because of some weird behavior of the Tooltip */}
-          <span key={`LABEL_${event.id?.toString()}`}>
-            {startCase(event.event)}
-          </span>
-        </Tooltip>
+        <span>{startCase(event.event)}</span>
       </TimelineContent>
       <Popover
         open={!!anchorEl}
-        // open={showPopover}
         anchorEl={anchorEl}
         onClose={() => {
           setAnchorEl(null);
@@ -203,12 +169,15 @@ export const TimelineItem: React.FC<TimelineItemProps> = ({
             {startCase(event.event)}
           </Typography>
           {event.html_url && (
-            <IconButton
-              href={event.html_url}
-              sx={{ position: "absolute", top: 0, right: 0 }}
-            >
-              <LinkIcon />
-            </IconButton>
+            // @todo update => https://www.figma.com/file/T10d2P2iNb1LdRC5a9J7vA/BP-Block-Week-Designs?node-id=72%3A7010
+            <Tooltip title="Copy link to request">
+              <IconButton
+                onClick={() => copyToClipboard(event.html_url)}
+                sx={{ position: "absolute", top: 0, right: 0 }}
+              >
+                <LinkIcon />
+              </IconButton>
+            </Tooltip>
           )}
         </Stack>
         <Typography

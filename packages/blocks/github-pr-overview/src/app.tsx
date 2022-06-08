@@ -13,7 +13,7 @@ import {
   getGithubEntityTypes,
 } from "./types";
 import { GithubPrOverview } from "./overview";
-import { GithubPrOverview as GithubPrOverview1 } from "./overview1";
+
 import {
   collectPrEventsAndSetState,
   collectPrsAndSetState,
@@ -39,6 +39,7 @@ export const App: BlockComponent<BlockEntityProperties> = ({
   accountId,
   entityId,
   aggregateEntities,
+  // selectedPullRequest,
   selectedPullRequest = {
     repository: "blockprotocol/blockprotocol",
     number: 298,
@@ -77,6 +78,7 @@ export const App: BlockComponent<BlockEntityProperties> = ({
   const [allPrs, setAllPrs] = React.useState<Map<string, GithubPullRequest>>();
   const [pullRequest, setPullRequest] =
     React.useState<GithubPullRequest>(dummyData);
+  // const [pullRequest, setPullRequest] = React.useState<GithubPullRequest>();
   const [reviews, setReviews] = React.useState<GithubReview[]>();
   const [events, setEvents] = React.useState<GithubIssueEvent[]>();
 
@@ -235,22 +237,13 @@ export const App: BlockComponent<BlockEntityProperties> = ({
             allPrs={allPrs!}
           />
         ) : blockState === BlockState.Overview ? (
-          <>
-            <GithubPrOverview
-              pullRequest={pullRequest!}
-              reviews={reviews!}
-              events={events!}
-              setSelectedPullRequestId={setSelectedPullRequestIdAndPersist}
-              setBlockState={setBlockState}
-            />
-            <GithubPrOverview1
-              pullRequest={pullRequest!}
-              reviews={reviews!}
-              events={events!}
-              setSelectedPullRequestId={setSelectedPullRequestIdAndPersist}
-              setBlockState={setBlockState}
-            />
-          </>
+          <GithubPrOverview
+            pullRequest={pullRequest!}
+            reviews={reviews!}
+            events={events!}
+            setSelectedPullRequestId={setSelectedPullRequestIdAndPersist}
+            setBlockState={setBlockState}
+          />
         ) : (
           <div> Failed To Load Block </div>
         )}
