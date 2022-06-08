@@ -25,7 +25,8 @@
     "@mui/material": "5.4.3",
     "blockprotocol": "0.0.10",
     "date-fns": "2.28.0",
-    "lodash": "4.17.21"
+    "lodash": "4.17.21",
+    "react-transition-group": "4.4.2"
   },
   "devDependencies": {
     "block-scripts": "0.0.7",
