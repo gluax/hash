@@ -28,8 +28,7 @@ const FilterBtn = styled(({ ...props }: BoxProps) => (
 ))(({ theme }) => ({
   backgroundColor: "transparent",
   border: "none",
-  py: 1.5,
-  px: 2,
+  padding: `${theme.spacing(1.5)} ${theme.spacing(2)}`,
   width: "100%",
   display: "flex",
   alignItems: "center",
@@ -40,7 +39,7 @@ const FilterBtn = styled(({ ...props }: BoxProps) => (
     color: theme.palette.gray[80],
     ...theme.typography.smallTextLabels,
     fontWeight: 500,
-    marginRight: 1,
+    marginRight: theme.spacing(1),
   },
 
   svg: {
@@ -124,39 +123,6 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
           <Typography>Filter events</Typography>
           <ChevronDownIcon />
         </FilterBtn>
-        <Stack
-          component="button"
-          aria-describedby={popoverId}
-          onClick={(evt: React.MouseEvent<HTMLButtonElement>) =>
-            setAnchorEl(evt.currentTarget)
-          }
-          direction="row"
-          justifyContent="center"
-          alignItems="center"
-          spacing={1}
-          sx={({ palette, typography }) => ({
-            backgroundColor: "transparent",
-            border: "none",
-            py: 1.5,
-            px: 2,
-            width: "100%",
-            cursor: "pointer",
-
-            [`.${typographyClasses.root}`]: {
-              color: palette.gray[80],
-              ...typography.smallTextLabels,
-              fontWeight: 500,
-            },
-
-            svg: {
-              fontSize: 12,
-              color: palette.gray[50],
-            },
-          })}
-        >
-          <Typography>Filter events</Typography>
-          <ChevronDownIcon />
-        </Stack>
       </Paper>
       <Menu
         id={popoverId}
