@@ -50,8 +50,9 @@ export const App: BlockComponent<AppProps> = ({
   const [blockState, setBlockState] = React.useState(BlockState.Loading);
 
   // selectedPullRequest is just an Identifier, but isn't the associated GithubPullRequestEntity
-  const [selectedPullRequestId, setSelectedPullRequestId] =
-    React.useState(selectedPullRequest);
+  const [selectedPullRequestId, setSelectedPullRequestId] = React.useState<
+    PullRequestIdentifier | undefined
+  >(selectedPullRequest);
 
   const setSelectedPullRequestIdAndPersist = (
     pullRequestId?: PullRequestIdentifier,
@@ -144,7 +145,9 @@ export const App: BlockComponent<AppProps> = ({
       ).then((pullRequests) => {
         if (pullRequests) {
           const pr = pullRequests.results[0];
-          setPullRequest(pr);
+          if (pr) {
+            setPullRequest(pr);
+          }
         }
       });
     }
@@ -238,7 +241,7 @@ export const App: BlockComponent<AppProps> = ({
           />
         ) : blockState === BlockState.Overview ? (
           <GithubPrOverview
-            pullRequest={pullRequest!}
+            pullRequest={pullRequest}
             reviews={reviews!}
             events={events!}
             setSelectedPullRequestId={setSelectedPullRequestIdAndPersist}

@@ -1,5 +1,3 @@
-import { theme } from "@hashintel/hash-design-system";
-import { Link } from "@mui/icons-material";
 import {
   TimelineConnector,
   TimelineContent,
@@ -23,18 +21,11 @@ import { startCase } from "lodash";
 import * as React from "react";
 import { LinkIcon, PullRequestIcon } from "../icons";
 import { GithubPullRequest, GithubReview } from "../types";
-
-const NODE_COLORS = {
-  opened: theme.palette.gray[40],
-  reviewed: theme.palette.blue[50],
-  review_requested: theme.palette.orange[50],
-  mentioned: theme.palette.red[50],
-  deployed: theme.palette.purple[60],
-};
+import { getEventTypeColor } from "../utils";
 
 // @todo properly type this
 type Event = {
-  id: number | null | undefined;
+  id?: number | null | undefined;
   event:
     | "opened"
     | "reviewed"
@@ -64,7 +55,7 @@ export const TimelineItem: React.FC<TimelineItemProps> = ({
 
   //   const color = React.useMemo(() => {}, [[event]]);
 
-  const copyToClipboard = (link: string | null) => {
+  const copyToClipboard = (link: string | null | undefined) => {
     if (link) {
       void navigator.clipboard.writeText(link);
     }
@@ -115,8 +106,7 @@ export const TimelineItem: React.FC<TimelineItemProps> = ({
           <TimelineDot
             sx={{
               alignSelf: "center",
-              backgroundColor:
-                NODE_COLORS[event.event] ?? theme.palette.gray[40],
+              backgroundColor: getEventTypeColor(event.event),
             }}
             onMouseEnter={(evt) => {
               setAnchorEl(evt.currentTarget);
@@ -151,11 +141,11 @@ export const TimelineItem: React.FC<TimelineItemProps> = ({
           horizontal: "left",
         }}
         PaperProps={{
-          sx: ({ palette }) => ({
-            borderTop: `4px solid ${NODE_COLORS[event.event]}`,
+          sx: {
+            borderTop: `4px solid ${getEventTypeColor(event.event)}`,
             padding: "12px 16px",
             width: 250,
-          }),
+          },
         }}
       >
         <Stack
@@ -194,7 +184,8 @@ export const TimelineItem: React.FC<TimelineItemProps> = ({
         <Stack direction="row" alignItems="center" spacing={1}>
           <Avatar
             sx={{ height: 22, width: 22 }}
-            src={event.actor?.avatar_url}
+            src={event.actor?.avatar_url!}
+            alt={event.actor?.login!}
           />
           <Typography
             sx={({ palette }) => ({

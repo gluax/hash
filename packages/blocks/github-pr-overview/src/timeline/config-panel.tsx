@@ -11,11 +11,12 @@ import {
   ListItemIcon,
   styled,
   BoxProps,
+  ListItemText,
 } from "@mui/material";
 import { startCase } from "lodash";
 import * as React from "react";
 import { ChevronDownIcon, CheckDoubleIcon, ClearIcon } from "../icons";
-import { getNodeColor } from "../utils";
+import { getEventTypeColor } from "../utils";
 
 type ConfigPanelProps = {
   possibleEventTypes: string[];
@@ -83,6 +84,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
         sx={({ palette }) => ({
           backgroundColor: palette.white,
           alignSelf: "flex-start",
+          minWidth: 170,
         })}
       >
         <Typography fontWeight="bold" px={2} pt={1.5} mb={1.75}>
@@ -107,7 +109,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
                   height: 12,
                   width: 12,
                   borderRadius: "50%",
-                  backgroundColor: getNodeColor(eventType),
+                  backgroundColor: getEventTypeColor(eventType),
                 }}
               />
               <Box component="span">{startCase(eventType)}</Box>
@@ -148,7 +150,9 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
           <ListItemIcon>
             {allItemsSelected ? <ClearIcon /> : <CheckDoubleIcon />}
           </ListItemIcon>
-          {allItemsSelected ? "Clear All" : "Select All"}
+          <ListItemText
+            primary={allItemsSelected ? "Clear All" : "Select All"}
+          />
         </MenuItem>
       </Menu>
     </>

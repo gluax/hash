@@ -8,6 +8,11 @@
     "github",
     "pullrequest"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hashintel/hash.git",
+    "directory": "packages/blocks/github-pr-overview"
+  },
   "license": "MIT",
   "author": "Alfred Mountfield",
   "scripts": {
@@ -44,7 +49,12 @@
   "blockprotocol": {
     "displayName": "GitHub Pull-Request Overview",
     "examples": [
-      {}
+      {
+        "selectedPullRequest": {
+          "repository": "blockprotocol/blockprotocol",
+          "number": 298
+        }
+      }
     ],
     "icon": "public/pull-request.svg",
     "image": "public/block-preview.svg"
