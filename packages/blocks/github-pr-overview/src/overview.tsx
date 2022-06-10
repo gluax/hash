@@ -3,27 +3,29 @@ import Avatar from "@mui/material/Avatar";
 import Stack from "@mui/material/Stack";
 import { uniqBy } from "lodash";
 import formatDistance from "date-fns/formatDistance";
-import {
-  Box,
-  Typography,
-  Divider,
-  AvatarGroup,
-  typographyClasses,
-} from "@mui/material";
+import { Box, Typography, Divider, typographyClasses } from "@mui/material";
 // import { Button } from "@hashintel/hash-design-system";
 import {
   GithubIssueEvent,
   GithubPullRequest,
   GithubReview,
+  isDefined,
   PullRequestIdentifier,
 } from "./types";
 import { GithubPrTimeline } from "./timeline";
-import { GithubIcon, PullRequestIcon } from "./icons";
+import { CommentIcon, GithubIcon, PullRequestIcon } from "./icons";
+import { Reviews } from "./reviews";
+import { getEventTypeColor } from "./utils";
 
-// move to different file
-const PRStatus: React.FC<{ status: "open" | "closed" | "merged" }> = ({
-  status,
-}) => {
+export type GithubPrOverviewProps = {
+  pullRequest: GithubPullRequest;
+  reviews: GithubReview[];
+  events: GithubIssueEvent[];
+  setSelectedPullRequestId: (x?: PullRequestIdentifier) => void;
+  setBlockState: (x: any) => void;
+};
+
+const PRStatus: React.FC<{ status: string }> = ({ status }) => {
   return (
     <Box
       sx={({ palette }) => ({
@@ -33,12 +35,7 @@ const PRStatus: React.FC<{ status: "open" | "closed" | "merged" }> = ({
         color: palette.white,
         borderRadius: 20,
         textTransform: "capitalize",
-        backgroundColor:
-          status === "merged"
-            ? palette.purple[70]
-            : status === "open"
-            ? palette.blue[60]
-            : palette.gray[60],
+        backgroundColor: getEventTypeColor(status),
       })}
     >
       <PullRequestIcon sx={{ mr: 0.75, fontSize: 12 }} />
@@ -47,144 +44,6 @@ const PRStatus: React.FC<{ status: "open" | "closed" | "merged" }> = ({
       </Typography>
     </Box>
   );
-};
-
-export const Reviewer = (login: string, avatar_url?: string | null) => (
-  <Stack direction="row" spacing={1}>
-    <Avatar
-      alt={login}
-      src={avatar_url ?? undefined}
-      sx={{ width: "0.8em", height: "0.8em" }}
-      style={{ alignSelf: "center" }}
-    />
-    <span>{login}</span>
-  </Stack>
-);
-
-export const Reviews: React.FC<{
-  pendingReviews: { avatar_url: string; login: string }[];
-  completedReviews: { avatar_url: string; login: string }[];
-}> = ({ pendingReviews, completedReviews }) => (
-  <Box>
-    <Typography
-      variant="regularTextParagraphs"
-      sx={({ palette }) => ({ color: palette.gray[90], mb: 1.75 })}
-    >
-      Reviews
-    </Typography>
-    <Stack direction="row" spacing={4}>
-      <Box>
-        <Stack direction="row" alignItems="center">
-          <Typography
-            variant="smallTextLabels"
-            sx={({ palette }) => ({ color: palette.gray[90] })}
-          >
-            Pending
-          </Typography>
-          <Box
-            sx={({ palette }) => ({
-              height: 20,
-              width: 20,
-              borderRadius: "50%",
-              backgroundColor: palette.gray[20],
-              ml: 0.75,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              [`& ${typographyClasses.root}`]: {
-                color: palette.gray[70],
-              },
-            })}
-          >
-            <Typography variant="microText">{pendingReviews.length}</Typography>
-          </Box>
-        </Stack>
-
-        <Stack direction="row" alignItems="center" spacing={1}>
-          <AvatarGroup max={1}>
-            {pendingReviews.map(({ avatar_url }, index) => (
-              <Avatar
-                key={index}
-                src={avatar_url}
-                sx={{ height: 28, width: 28 }}
-              />
-            ))}
-          </AvatarGroup>
-          <Typography
-            sx={({ palette }) => ({
-              color: palette.gray[70],
-            })}
-          >
-            {pendingReviews.map(({ login }, index) => (
-              <span>
-                {login} {index < pendingReviews.length - 1 ? "," : ""}
-              </span>
-            ))}
-          </Typography>
-        </Stack>
-      </Box>
-      <Box>
-        <Stack direction="row" alignItems="center">
-          <Typography
-            variant="smallTextLabels"
-            sx={({ palette }) => ({ color: palette.gray[90] })}
-          >
-            Completed
-          </Typography>
-          <Box
-            sx={({ palette }) => ({
-              height: 20,
-              width: 20,
-              borderRadius: "50%",
-              backgroundColor: palette.gray[20],
-              ml: 0.75,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              [`& ${typographyClasses.root}`]: {
-                color: palette.gray[70],
-              },
-            })}
-          >
-            <Typography variant="microText">
-              {completedReviews.length}
-            </Typography>
-          </Box>
-        </Stack>
-
-        <Stack direction="row" alignItems="center" spacing={1}>
-          <AvatarGroup max={1}>
-            {completedReviews.map(({ avatar_url }, index) => (
-              <Avatar
-                key={index}
-                src={avatar_url}
-                sx={{ height: 28, width: 28 }}
-              />
-            ))}
-          </AvatarGroup>
-          <Typography
-            sx={({ palette }) => ({
-              color: palette.gray[70],
-            })}
-          >
-            {pendingReviews.map(({ login }, index) => (
-              <span>
-                {login} {index < pendingReviews.length - 1 ? "," : ""}
-              </span>
-            ))}
-          </Typography>
-        </Stack>
-      </Box>
-    </Stack>
-  </Box>
-);
-
-export type GithubPrOverviewProps = {
-  pullRequest: GithubPullRequest;
-  reviews: GithubReview[];
-  events: GithubIssueEvent[];
-  setSelectedPullRequestId: (x?: PullRequestIdentifier) => void;
-  setBlockState: (x: any) => void;
 };
 
 export const GithubPrOverview: React.FunctionComponent<
@@ -226,21 +85,24 @@ export const GithubPrOverview: React.FunctionComponent<
       <Box
         sx={({ palette }) => ({ backgroundColor: palette.white, padding: 3 })}
       >
-        <Stack direction="row" alignItems="center" spacing={1} mb={1.5}>
-          <GithubIcon
-            sx={({ palette }) => ({
+        <Stack
+          direction="row"
+          alignItems="center"
+          spacing={1}
+          mb={1.5}
+          sx={({ palette }) => ({
+            svg: {
               height: 20,
               width: 20,
               color: palette.gray[50],
-            })}
-          />
-          <Typography
-            sx={({ palette }) => ({
+            },
+            [`.${typographyClasses.root}`]: {
               color: palette.gray[80],
-            })}
-          >
-            hashintel/hash
-          </Typography>
+            },
+          })}
+        >
+          <GithubIcon />
+          <Typography>{pullRequest.repository}</Typography>
         </Stack>
 
         <Typography
@@ -255,9 +117,9 @@ export const GithubPrOverview: React.FunctionComponent<
             sx={({ palette }) => ({ color: palette.gray[50] })}
             component="span"
           >
-            #453
+            #{pullRequest.number}
           </Box>{" "}
-          Very long title of a pull request that needs to wrap onto another line
+          {pullRequest.title}
         </Typography>
         <Box display="flex" alignItems="center">
           {/*  */}
@@ -279,7 +141,7 @@ export const GithubPrOverview: React.FunctionComponent<
               Opened by {pullRequest.user?.login}
             </Typography>
             <Stack direction="row">
-              {/* Add comments icon */}
+              <CommentIcon sx={{ mr: 1 }} />
               {`${reviews.length} review${reviews.length > 1 ? "s" : ""}`}
             </Stack>
           </Box>
@@ -288,30 +150,10 @@ export const GithubPrOverview: React.FunctionComponent<
         <Divider sx={{ mt: 3, mb: 2 }} />
 
         <Reviews
-          // pendingReviews={(pullRequest.requested_reviewers ?? [])
-          //   ?.filter(isDefined)
-          //   .map(({ login, avatar_url }) => ({ login, avatar_url }))}
-          // completedReviews={uniqueReviewers}
-          pendingReviews={[
-            {
-              login: "kachkaev",
-              avatar_url: "https://avatars.githubusercontent.com/u/608862?v=4",
-            },
-            {
-              login: "Ciaran",
-              avatar_url: "https://avatars.githubusercontent.com/u/608862?v=4",
-            },
-          ]}
-          completedReviews={[
-            {
-              login: "kachkaev",
-              avatar_url: "https://avatars.githubusercontent.com/u/608862?v=4",
-            },
-            {
-              login: "Ciaran",
-              avatar_url: "https://avatars.githubusercontent.com/u/608862?v=4",
-            },
-          ]}
+          pendingReviews={(pullRequest.requested_reviewers ?? [])
+            ?.filter(isDefined)
+            .map(({ login, avatar_url }) => ({ login, avatar_url }))}
+          completedReviews={uniqueReviewers}
         />
       </Box>
       <Box

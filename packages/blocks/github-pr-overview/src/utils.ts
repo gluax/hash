@@ -1,3 +1,4 @@
+import { startCase } from "lodash";
 import { theme } from "@hashintel/hash-design-system";
 
 // @todo reviese the colors here
@@ -11,10 +12,14 @@ const NODE_COLORS = {
   mentioned: theme.palette.red[50],
 } as { [k: string]: string };
 
-export const getNodeColor = (eventType: string) => {
+export const getEventTypeColor = (eventType: string) => {
   if (eventType in NODE_COLORS) {
     return NODE_COLORS[eventType];
   }
 
   return theme.palette.gray[40];
+};
+
+export const getEventTypeName = (eventType: string) => {
+  return startCase(eventType.replaceAll("_", " "));
 };

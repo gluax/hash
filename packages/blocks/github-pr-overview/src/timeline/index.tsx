@@ -112,6 +112,7 @@ export const GithubPrTimeline: React.FunctionComponent<
                 <Collapse in key={event.id?.toString()}>
                   <TimelineItem
                     key={event.id?.toString()}
+                    // @ts-ignore
                     event={event}
                     hideConnector={idx >= filteredNodes.length - 1}
                     setTimelineOpacity={setTimelineOpacity}
