@@ -2,7 +2,7 @@
   "entityTypes": [
     {
       "$id": "https://example.com/types/Company",
-      "title": "Company",
+      "title": "TestCompany",
       "entityTypeId": "Company",
       "type": "object",
       "$schema": "https://json-schema.org/draft/2019-09/schema",
@@ -22,7 +22,7 @@
     },
     {
       "$id": "https://example.com/types/Person",
-      "title": "Person",
+      "title": "TestPerson",
       "entityTypeId": "Person",
       "type": "object",
       "$schema": "https://json-schema.org/draft/2019-09/schema",
@@ -59,7 +59,7 @@
       "createdAt": "2022-06-09T12:54:09.454Z",
       "updatedAt": "2022-06-09T12:54:09.454Z",
       "employees": 7838,
-      "name": "Acme Corp.",
+      "name": "Test Acme Corp.",
       "accountId": "accountId"
     },
     {
@@ -69,7 +69,7 @@
       "updatedAt": "2022-06-09T12:54:09.454Z",
       "age": 100,
       "email": "Michael@example.com",
-      "name": "Michael",
+      "name": "Test Michael",
       "username": "michael",
       "accountId": "accountId"
     },
@@ -104,7 +104,7 @@
     },
     {
       "entityId": "person-2",
-      "entityTypeId": "Person",
+      "entityTypeId": "Test Person",
       "createdAt": "2022-06-09T12:54:09.454Z",
       "updatedAt": "2022-06-09T12:54:09.454Z",
       "age": 4,
@@ -254,10 +254,15 @@
       "accountId": "accountId"
     },
     {
-      "accountId": "accountId",
-      "entityId": "test-entity-1",
-      "name": "World",
-      "entityTypeId": "blockType1"
+      "entityId": "person-9",
+      "entityTypeId": "Person",
+      "createdAt": "2022-06-09T12:54:09.454Z",
+      "updatedAt": "2022-06-09T12:54:09.454Z",
+      "age": 96,
+      "email": "Steven@example.com",
+      "name": "Test Steven",
+      "username": "steven",
+      "accountId": "accountId"
     }
   ]
 }
