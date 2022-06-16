@@ -1,4 +1,5 @@
 import { MenuCheckboxItem } from "@hashintel/hash-design-system";
+import { palette } from "@hashintel/hash-design-system/theme/palette";
 import {
   Paper,
   Typography,
@@ -35,6 +36,10 @@ const FilterBtn = styled(({ ...props }: BoxProps) => (
   alignItems: "center",
   justifyContent: "center",
   cursor: "pointer",
+
+  "&:hover": {
+    background: theme.palette.gray[10],
+  },
 
   [`.${typographyClasses.root}`]: {
     color: theme.palette.gray[80],

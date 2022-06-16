@@ -30,7 +30,8 @@ const PRStatus: React.FC<{ status: string }> = ({ status }) => {
     <Box
       sx={({ palette }) => ({
         display: "inline-flex",
-        py: 1.5,
+        alignItems: "center",
+        py: 1.3125,
         px: 2,
         color: palette.white,
         borderRadius: 20,
@@ -39,7 +40,11 @@ const PRStatus: React.FC<{ status: string }> = ({ status }) => {
       })}
     >
       <PullRequestIcon sx={{ mr: 0.75, fontSize: 12 }} />
-      <Typography variant="smallTextLabels" color="currentcolor">
+      <Typography
+        variant="smallTextLabels"
+        fontWeight={500}
+        color="currentcolor"
+      >
         {status}
       </Typography>
     </Box>
@@ -73,10 +78,10 @@ export const GithubPrOverview: React.FunctionComponent<
   /** @todo - Get colours from theme? */
   const status =
     pullRequest.merged_at != null
-      ? { text: "Merged", color: "DarkMagenta" }
+      ? "merged"
       : pullRequest.state === "closed"
-      ? { text: "Closed", color: "darkred" }
-      : { text: "Open", color: "green" };
+      ? "closed"
+      : "open";
 
   console.log({ pullRequest });
 
@@ -102,7 +107,7 @@ export const GithubPrOverview: React.FunctionComponent<
           })}
         >
           <GithubIcon />
-          <Typography>{pullRequest.repository}</Typography>
+          <Typography fontWeight={500}>{pullRequest.repository}</Typography>
         </Stack>
 
         <Typography
@@ -124,8 +129,10 @@ export const GithubPrOverview: React.FunctionComponent<
         <Box display="flex" alignItems="center">
           {/*  */}
           <Box display="flex" alignItems="center" mr={3}>
-            <PRStatus status={status.text.toLowerCase()} />
-            <Typography sx={{ ml: 0.75 }}>within {timeToClose}</Typography>
+            <PRStatus status={status} />
+            <Typography variant="smallTextLabels" fontWeight={500} ml={0.75}>
+              within {timeToClose}
+            </Typography>
           </Box>
           <Box display="flex" alignItems="center">
             <Avatar
@@ -136,18 +143,41 @@ export const GithubPrOverview: React.FunctionComponent<
             />
             <Typography
               variant="smallTextLabels"
-              sx={({ palette }) => ({ color: palette.gray[70], mr: 3 })}
+              sx={({ palette }) => ({
+                color: palette.gray[70],
+                mr: 3,
+                fontWeight: 500,
+              })}
             >
               Opened by {pullRequest.user?.login}
             </Typography>
-            <Stack direction="row">
+            <Stack
+              direction="row"
+              alignItems="center"
+              typography="smallTextLabels"
+              sx={({ palette }) => ({
+                color: palette.gray[70],
+                fontWeight: 500,
+                svg: {
+                  color: palette.gray[50],
+                },
+              })}
+            >
               <CommentIcon sx={{ mr: 1 }} />
-              {`${reviews.length} review${reviews.length > 1 ? "s" : ""}`}
+              <span>
+                {`${reviews.length} review${reviews.length > 1 ? "s" : ""}`}
+              </span>
             </Stack>
           </Box>
         </Box>
 
-        <Divider sx={{ mt: 3, mb: 2 }} />
+        <Divider
+          sx={({ palette }) => ({
+            mt: 3,
+            mb: 2,
+            borderColor: palette.gray[30],
+          })}
+        />
 
         <Reviews
           pendingReviews={(pullRequest.requested_reviewers ?? [])

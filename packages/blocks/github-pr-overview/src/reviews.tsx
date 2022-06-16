@@ -23,7 +23,7 @@ const Section: React.FC<SectionProps> = ({ title, reviews }) => {
       <Stack direction="row" alignItems="center">
         <Typography
           variant="smallTextLabels"
-          sx={({ palette }) => ({ color: palette.gray[90] })}
+          sx={({ palette }) => ({ color: palette.gray[90], fontWeight: 500 })}
         >
           {title}
         </Typography>
@@ -39,6 +39,7 @@ const Section: React.FC<SectionProps> = ({ title, reviews }) => {
             alignItems: "center",
             [`& ${typographyClasses.root}`]: {
               color: palette.gray[70],
+              fontWeight: 600,
             },
           })}
         >
@@ -47,7 +48,7 @@ const Section: React.FC<SectionProps> = ({ title, reviews }) => {
       </Stack>
 
       <Stack direction="row" alignItems="center" spacing={1}>
-        <AvatarGroup max={1}>
+        <AvatarGroup max={3}>
           {reviews.map(({ avatar_url, login }) => (
             <Avatar
               key={avatar_url}
@@ -58,13 +59,17 @@ const Section: React.FC<SectionProps> = ({ title, reviews }) => {
           ))}
         </AvatarGroup>
         <Typography
+          variant="smallTextLabels"
           sx={({ palette }) => ({
             color: palette.gray[70],
+            lineHeight: 1,
+            fontWeight: 500,
           })}
         >
           {reviews.map(({ login }, index) => (
             <span key={login}>
-              {login} {index < reviews.length - 1 ? ", " : ""}
+              {login}
+              {index < reviews.length - 1 ? ", " : ""}
             </span>
           ))}
         </Typography>
@@ -91,7 +96,12 @@ export const Reviews: React.FC<ReviewsProps> = ({
   <Box>
     <Typography
       variant="regularTextParagraphs"
-      sx={({ palette }) => ({ color: palette.gray[90], mb: 1.75 })}
+      sx={({ palette }) => ({
+        display: "block",
+        color: palette.gray[90],
+        mb: 1.75,
+        fontWeight: 600,
+      })}
     >
       Reviews
     </Typography>
