@@ -50,23 +50,14 @@ const customTheme: Theme = {
 };
 
 export const App: BlockComponent<BlockEntityProperties> = ({
-  accountId,
-  // entityId,
   graph: { blockEntity },
-  // aggregateEntities,
-  // selectedPullRequest,
-  // selectedPullRequest = {
-  //   repository: (mockData.entities[0] as GithubPullRequest).repository,
-  //   number: (mockData.entities[0] as GithubPullRequest).number,
-  // } as PullRequestIdentifier,
-  // updateEntities,
-  // aggregateEntityTypes,
 }) => {
   const blockRef = React.useRef<HTMLDivElement>(null);
   const { graphService } = useGraphBlockService(blockRef);
   const {
     entityId,
     properties: {
+      // selectedPullRequest,
       selectedPullRequest = {
         repository: (mockData.entities[0] as GithubPullRequest).repository,
         number: (mockData.entities[0] as GithubPullRequest).number,
@@ -74,6 +65,7 @@ export const App: BlockComponent<BlockEntityProperties> = ({
     },
   } = blockEntity;
   const [blockState, setBlockState] = React.useState(BlockState.Loading);
+  // const [blockState, setBlockState] = React.useState(BlockState.Selector);
 
   // selectedPullRequest is just an Identifier, but isn't the associated GithubPullRequestEntity
   const [selectedPullRequestId, setSelectedPullRequestId] = React.useState<
@@ -83,20 +75,19 @@ export const App: BlockComponent<BlockEntityProperties> = ({
   const setSelectedPullRequestIdAndPersist = (
     pullRequestId?: PullRequestIdentifier,
   ) => {
-    void graphService
-      ?.updateEntity({
-        data: {
-          entityId,
-          properties: {
-            selectedPullRequest: pullRequestId,
-          },
+    void graphService?.updateEntity({
+      data: {
+        entityId,
+        properties: {
+          selectedPullRequest: pullRequestId,
         },
-      })
-      .then(({ errors }) => {
-        if (errors) {
-          console.error(errors);
-        }
-      });
+      },
+    });
+    // .then(({ errors }) => {
+    //   if (errors) {
+    //     console.error(errors);
+    //   }
+    // });
 
     setSelectedPullRequestId(pullRequestId);
   };
@@ -115,13 +106,14 @@ export const App: BlockComponent<BlockEntityProperties> = ({
   /** @todo - Figure out when to query for more than one page, probably querying until no more results */
 
   React.useEffect(() => {
+    if (!blockRef.current) return;
     if (
       graphService?.aggregateEntityTypes &&
       githubEntityTypeIds === undefined
     ) {
       setBlockState(BlockState.Loading);
       getGithubEntityTypes(
-        graphService.aggregateEntityTypes,
+        graphService,
         5,
         setGithubEntityTypeIds,
         setBlockState,
@@ -129,7 +121,6 @@ export const App: BlockComponent<BlockEntityProperties> = ({
     }
   }, [
     githubEntityTypeIds,
-    accountId,
     setGithubEntityTypeIds,
     setBlockState,
     graphService,
@@ -137,15 +128,17 @@ export const App: BlockComponent<BlockEntityProperties> = ({
 
   // Block hasn't been initialized with a selected Pull Request, get all PRs to allow user to pick
   React.useEffect(() => {
+    if (!blockRef.current) return;
     if (
       selectedPullRequestId === undefined &&
-      githubEntityTypeIds !== undefined
+      githubEntityTypeIds !== undefined &&
+      graphService?.aggregateEntities
     ) {
+      alert("got here");
       setBlockState(BlockState.Loading);
       collectPrsAndSetState(
         githubEntityTypeIds[GITHUB_ENTITY_TYPES.PullRequest],
-        graphService?.aggregateEntities,
-        accountId,
+        graphService,
         5,
         setAllPrs,
         setBlockState,
@@ -155,13 +148,15 @@ export const App: BlockComponent<BlockEntityProperties> = ({
     githubEntityTypeIds,
     selectedPullRequestId,
     graphService,
-    accountId,
     setAllPrs,
     setBlockState,
   ]);
 
   // Block has been initialized with a selected Pull Request, get associated info
   React.useEffect(() => {
+    if (!blockRef.current) return;
+    if (!graphService?.aggregateEntities) return;
+
     if (
       selectedPullRequestId !== undefined &&
       githubEntityTypeIds !== undefined
@@ -169,7 +164,7 @@ export const App: BlockComponent<BlockEntityProperties> = ({
       setBlockState(BlockState.Loading);
       void getPrs(
         githubEntityTypeIds[GITHUB_ENTITY_TYPES.PullRequest],
-        graphService?.aggregateEntities,
+        graphService,
         1,
         selectedPullRequestId,
       ).then((pullRequests) => {
@@ -185,21 +180,21 @@ export const App: BlockComponent<BlockEntityProperties> = ({
     githubEntityTypeIds,
     selectedPullRequestId,
     graphService,
-    accountId,
     setPullRequest,
     setBlockState,
   ]);
 
   React.useEffect(() => {
+    if (!blockRef.current) return;
     if (
       selectedPullRequestId !== undefined &&
-      githubEntityTypeIds !== undefined
+      githubEntityTypeIds !== undefined &&
+      graphService?.aggregateEntities
     ) {
       setBlockState(BlockState.Loading);
       collectReviewsAndSetState(
         githubEntityTypeIds[GITHUB_ENTITY_TYPES.Review],
-        graphService?.aggregateEntities,
-        accountId,
+        ({ data }) => graphService?.aggregateEntities({ data }),
         1,
         setReviews,
         selectedPullRequestId,
@@ -209,20 +204,21 @@ export const App: BlockComponent<BlockEntityProperties> = ({
     githubEntityTypeIds,
     selectedPullRequestId,
     graphService,
-    accountId,
     setReviews,
     setBlockState,
   ]);
+
   React.useEffect(() => {
+    if (!blockRef.current) return;
     if (
       selectedPullRequestId !== undefined &&
-      githubEntityTypeIds !== undefined
+      githubEntityTypeIds !== undefined &&
+      graphService?.aggregateEntities
     ) {
       setBlockState(BlockState.Loading);
       collectPrEventsAndSetState(
         githubEntityTypeIds[GITHUB_ENTITY_TYPES.IssueEvent],
-        graphService?.aggregateEntities,
-        accountId,
+        ({ data }) => graphService?.aggregateEntities({ data }),
         1,
         setEvents,
         selectedPullRequestId,
@@ -232,7 +228,6 @@ export const App: BlockComponent<BlockEntityProperties> = ({
     githubEntityTypeIds,
     selectedPullRequestId,
     graphService,
-    accountId,
     setEvents,
     setBlockState,
   ]);
@@ -258,6 +253,7 @@ export const App: BlockComponent<BlockEntityProperties> = ({
     <ThemeProvider theme={customTheme}>
       <CssBaseline />
       <Box
+        ref={blockRef}
         sx={({ palette }) => ({
           background: palette.gray[20],
         })}
@@ -271,9 +267,9 @@ export const App: BlockComponent<BlockEntityProperties> = ({
           />
         ) : blockState === BlockState.Overview ? (
           <GithubPrOverview
-            pullRequest={pullRequest}
-            reviews={reviews!}
-            events={events!}
+            pullRequest={pullRequest?.properties}
+            reviews={reviews?.map((review) => ({ ...review.properties })) ?? []}
+            events={events?.map((event) => ({ ...event.properties })) ?? []}
             setSelectedPullRequestId={setSelectedPullRequestIdAndPersist}
             setBlockState={setBlockState}
           />

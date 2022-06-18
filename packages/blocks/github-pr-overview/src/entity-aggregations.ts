@@ -24,15 +24,11 @@ const ITEMS_PER_PAGE = 100;
 
 export const getPrs = async (
   githubPullRequestTypeId: string,
-  aggregateEntities?: GraphBlockHandler["aggregateEntities"],
+  graphService: GraphBlockHandler,
   pageNumber?: number,
   selectedPullRequest?: PullRequestIdentifier,
 ): Promise<AggregateEntitiesResult<Entity<GithubPullRequest>> | void> => {
-  if (!aggregateEntities) {
-    return new Promise<void>(() => {});
-  }
-
-  const res = await aggregateEntities({
+  const res = await graphService?.aggregateEntities({
     data: {
       operation: {
         entityTypeId: githubPullRequestTypeId,
@@ -61,43 +57,39 @@ export const getPrs = async (
     },
   });
 
-  if (res.data) {
+  // @todo fix types
+
+  if (!res.errors && res.data) {
     return res.data;
   }
 
-  // @todo fix
+  return { results: [] };
 };
 
 export const collectPrsAndSetState = (
   githubPullRequestTypeId: string,
-  aggregateEntities: GraphBlockHandler["aggregateEntities"] | undefined,
+  graphService: GraphBlockHandler,
   numPages: number,
   setState: (x: any) => void,
   setBlockState: (x: any) => void,
 ) => {
-  if (!aggregateEntities) {
-    // do something
-    // or better still handle the check for this in the method's caller
-  }
-
   const promises = Array(numPages)
     .fill(undefined)
     .map((_, pageNumber) =>
-      getPrs(githubPullRequestTypeId, aggregateEntities, pageNumber),
+      getPrs(githubPullRequestTypeId, graphService, pageNumber),
     );
-
   Promise.all(promises)
     .then((entitiesResults) => {
       const entities: GithubPullRequest[] = entitiesResults
         .flatMap((entityResult) => entityResult?.results)
         .filter(isDefined);
 
-      const pullRequests = uniqBy(entities, "id");
+      const pullRequests = uniqBy(entities, "properties.id");
 
       const mappedPullRequests = new Map();
 
       for (const pullRequest of pullRequests) {
-        const pullRequestId = `${pullRequest.repository}/${pullRequest.number}`;
+        const pullRequestId = `${pullRequest.properties.repository}/${pullRequest.properties.number}`;
         mappedPullRequests.set(pullRequestId, pullRequest);
       }
 
@@ -151,7 +143,7 @@ const getReviews = async (
     },
   });
 
-  if (res.data) {
+  if (!res.errors && res.data) {
     return res.data;
   }
   // @todo fix
@@ -160,7 +152,6 @@ const getReviews = async (
 export const collectReviewsAndSetState = (
   githubReviewTypeId: string,
   aggregateEntities: GraphBlockHandler["aggregateEntities"] | undefined,
-  accountId: string | null | undefined,
   numPages: number,
   setState: (x: any) => void,
   selectedPullRequest: PullRequestIdentifier,
@@ -171,7 +162,6 @@ export const collectReviewsAndSetState = (
       getReviews(
         githubReviewTypeId,
         aggregateEntities,
-        accountId,
         pageNumber,
         selectedPullRequest,
       ),
@@ -183,7 +173,7 @@ export const collectReviewsAndSetState = (
         .flatMap((entityResult) => entityResult?.results)
         .filter(isDefined);
 
-      const reviews = uniqBy(entities, "id");
+      const reviews = uniqBy(entities, "properties.id");
 
       setState(reviews);
     })
@@ -236,13 +226,14 @@ const getPrEvents = (
     },
   });
 
-  return res;
+  return res as Promise<AggregateEntitiesResult<
+    Entity<GithubIssueEvent>
+  > | void>;
 };
 
 export const collectPrEventsAndSetState = (
   githubIssueEventTypeId: string,
   aggregateEntities: GraphBlockHandler["aggregateEntities"] | undefined,
-  accountId: string | null | undefined,
   numPages: number,
   setState: (x: any) => void,
   selectedPullRequest: PullRequestIdentifier,
@@ -254,7 +245,6 @@ export const collectPrEventsAndSetState = (
       getPrEvents(
         githubIssueEventTypeId,
         aggregateEntities,
-        accountId,
         pageNumber,
         selectedPullRequest,
       ),
@@ -266,10 +256,11 @@ export const collectPrEventsAndSetState = (
         .flatMap((entityResult) => entityResult?.results)
         .filter(isDefined)
         .filter(
-          (entity: GithubIssueEvent) => isDefined(entity.issue?.pull_request), // We only want events for pull requests, not general issues
+          (entity: GithubIssueEvent) =>
+            isDefined(entity.properties.issue?.pull_request), // We only want events for pull requests, not general issues
         );
 
-      const events = uniqBy(entities, "id");
+      const events = uniqBy(entities, "properties.id");
 
       setState(events);
     })
